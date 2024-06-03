@@ -1,4 +1,3 @@
-// Import required modules
 const express = require('express')
 const cors = require('cors')
 const dotenv = require('dotenv')
@@ -7,8 +6,11 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const compression = require('compression')
 const helmet = require('helmet')
+const passport = require('passport')
 const errorHandler = require('./middleware/errorHandler')
 const dataConnection = require('./config/dataConnection')
+const userRoutes = require('./routes/UserRoutes')
+const authRoutes = require('./routes/authRoutes')
 
 // Load environment variables from .env file
 dotenv.config()
@@ -16,25 +18,36 @@ dotenv.config()
 // Initialize Express app
 const app = express()
 
+// Passport middleware
+app.use(passport.initialize())
+require('./config/passport')(passport)
+
 // Set up middleware
-app.use(cors())
+app.use(
+  cors({
+    origin: ['http://localhost:3000'], // Allow requests from the frontend running on port 3000
+    credentials: true, // Allow sending cookies along with requests
+  }),
+)
 app.use(bodyParser.json())
 app.use(morgan('dev'))
 app.use(compression())
 app.use(helmet())
 
-// Error handling middleware
-app.use(errorHandler)
-
 // Connect to MongoDB database
-
 dataConnection()
 
-// Define routes
+// Define routes to endpoints here
 // Example route
 app.get('/', (req, res) => {
   res.send('Hello World! This means the server is running successfully.')
 })
+
+app.use('/api', authRoutes)
+app.use('/api', userRoutes)
+
+// Error handling middleware (move to the end)
+app.use(errorHandler)
 
 // Set port
 const PORT = process.env.PORT || 5000

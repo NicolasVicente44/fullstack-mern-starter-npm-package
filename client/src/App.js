@@ -1,17 +1,23 @@
-// client/src/App.js
-
 import React from "react";
-import "./styles/tailwind.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import HomePage from "./pages/HomePage";
+import "./styles/tailwind.css"; //tailwind import
 
-function App() {
+const App = () => {
   return (
-    <div className="bg-gray-100">
-      <h1 className="text-green-500 text-center mx-0 my-auto mt-12 text-4xl">
-        Hello, React! This project is working, if this text is green it means
-        tailwind is configured.
-      </h1>
-    </div>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
-}
+};
 
 export default App;
